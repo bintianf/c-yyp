@@ -27,7 +27,7 @@ using namespace std;
 using namespace Eigen;
 
 double eps = 0.5;
-double dt = 0.001;
+double dt = 0.0011;
 int T = 10000;
 double corner = -2;
 double range = 4;
