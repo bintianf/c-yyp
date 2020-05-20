@@ -3,8 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/lib/"
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",
