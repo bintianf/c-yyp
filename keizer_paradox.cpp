@@ -153,7 +153,7 @@ int main()
     for(int i = 0; i <= MAX; i++)
     {
 //        cout<<distribution[i]<<endl;
-        myfile<<distribution[i]<<endl;
+        myfile<< i*M*dt << " , " << distribution[i]/Sample_size<<endl;
     }
      
     myfile.close();
