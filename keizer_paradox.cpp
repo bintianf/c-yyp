@@ -26,9 +26,9 @@
 using namespace std;
 using namespace Eigen;
 
-double eps = 0.5;
+double eps = 1;
 double dt = 0.001;
-int T = 10000;
+int T = 1000;
 double corner = -2;
 double range = 4;
 
@@ -45,16 +45,10 @@ double fun(double x, double alpha_1, double a, double alpha_2, double beta)
     return tmp;
 }
 
-double reflection(double x1, double x2, double rnd1)
-{
-    double e = x1 - x2;
-    double P = 1 - 2*e*e;
-    return P*rnd1; 
-}
 
 int main()
 {
-    int Sample_size = 1000000;
+    int Sample_size = 10000;
     vector<int> coupling_time(Sample_size);
     ofstream myfile;
     myfile.open("keizer.txt");
@@ -70,78 +64,30 @@ int main()
     for(int i = rank*Sample_size/size; i < (rank+1)*Sample_size/size; i++)
         {
             double x1, x2;
-            x1 = corner + range*u(mt), corner + range*u(mt);
-            x2 = corner + range*u(mt), corner + range*u(mt);
+            x1 = corner + range*u(mt);
+            x2 = corner + range*u(mt);
             int count = 0;
-            int flag = 0;
-            double max1, min1, max2, min2, swap;
-            double tmp1, tmp2, tmp3;
-            while(count < 1e8 && flag == 0)
+            while(count < 1e6 && x1 != x2)
             {
                 count++;
                 double rnd1, rnd2;
                 rnd1 = nm(mt);
-                rnd2 = reflection(x1, x2, rnd1);//reflection coupling
-                //rnd2 << nm(mt), nm(mt);//independent coupling
-                //rnd2 = rnd1;//synchronous coupling
-                tmp1 = eps*sqrt(dt)*rnd1;
-                tmp2 = eps*sqrt(dt)*rnd2;
-                tmp3 = x1 - x2;
-                x1 += dt*fun(x1, 1, 2, 1, 1); // parameters of reaction rates
-                x2 += dt*fun(x2, 1, 2, 1, 1);
-                //cout<<tmp3.norm()<<endl;
-                if(tmp3 < 2*eps*sqrt(dt))
-                {
-                    min1 = normpdf(x1 + tmp1, x2, eps*sqrt(dt));
-                    min2 = normpdf(x2 + tmp2, x1, eps*sqrt(dt));
-                    max1 = normpdf(x1, x1 + tmp1, eps*sqrt(dt));
-                    max2 = normpdf(x2, x2 + tmp2, eps*sqrt(dt));
-                    if(max1 < min1)
-                    {
-                        swap = max1;
-                        max1 = min1;
-                        min1 = swap;
-                    }
-                    if(max2 < min2)
-                    {
-                        swap = max2;
-                        max2 = min2;
-                        min2 = swap;
-                    }
-                    if(u(mt) < min1*min2/(max1*max2))
-                    {
-                        flag = 1;
-                        x1 += tmp1;
-                        x2 = x1;
-                        //cout<<X1 + tmp1<<" "<<X2 + tmp2<<" "<<min1/max1<<" "<<min2/max2<<endl;
-                    }
-                    else
-                    {
-                        x1 += tmp1;
-                        x2 += tmp2;
-                    }
-                }
-                else
-                {
-                    x1 += tmp1;
-                    x2 += tmp2;
-                }
-                //cout<<X1<<" "<<X2<<endl;
-                
+                rnd2 = -rnd1;//reflection coupling
+                x1 += dt*fun(x1, 1, 2, 1, 1) + eps*sqrt(dt)*rnd1; // parameters of reaction rates
+                x2 += dt*fun(x2, 1, 2, 1, 1) + eps*sqrt(dt)*rnd2; 
             }
             coupling_time[i] = count;
         }
         
     }
 
-    sort(coupling_time.begin(), coupling_time.end());
     int MAX = coupling_time[coupling_time.size() - 1];
     cout<<"MAX = "<<MAX<<endl;
     vector<int> distribution(floor(MAX) + 1);
     int time_count = 0;
-    int M = 20;//count the coupling time every M steps
+    int M = 5;//count the coupling time every M steps
     distribution[0] = Sample_size;
-    for(int i = 0; i < (int)(MAX/20) +1; i++)
+    for(int i = 0; i < (int)(MAX/M) +1; i++)
     {
         while(coupling_time[time_count]/M == i)
         {
