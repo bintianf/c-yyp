@@ -97,6 +97,7 @@ int main()
                 tmp3 = X1 - X2;
                 X1 += dt*fun(X1);
                 X2 += dt*fun(X2);
+                cout<< "    " << X1 << "   " << X2 << endl;
                 //cout<<tmp3.norm()<<endl;
                 if(tmp3.norm() < 2*eps*sqrt(dt))
                 {
