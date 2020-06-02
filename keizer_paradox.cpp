@@ -42,27 +42,27 @@ double fun(double x, double alpha_1, double a, double alpha_2, double beta)
 
 int main()
 {
-    int Sample_size = 1000000;
+    int Sample_size = 10000;
     vector<int> coupling_time(Sample_size);
     ofstream myfile;
     myfile.open("keizer.txt");
     int N_threads = 8;
-// #pragma omp parallel num_threads(N_threads)
-    // {
-        // int rank = omp_get_thread_num();
-        // int size = omp_get_num_threads();
+#pragma omp parallel num_threads(N_threads)
+    {
+        int rank = omp_get_thread_num();
+        int size = omp_get_num_threads();
         random_device rd;
         mt19937 mt(rd());
         normal_distribution<double> nm(0.0, 1.0);
         uniform_real_distribution<double> u(0, 1.0);
-    for(int i = 0; i < Sample_size; i++)
+    for(int i = rank*Sample_size/size; i < (rank+1)*Sample_size/size; i++)
         {
             double x1, x2;
             x1 = corner + range*u(mt);
             x2 = corner + range*u(mt);
             int count = 0;
             int flag = 0;
-            while(count < 1e8 && flag == 0)
+            while(count < 1e6 && flag == 0)
             {
                 count++;
                 double rnd1, rnd2, temp1, temp2, temp3;
@@ -88,8 +88,7 @@ int main()
             }
             coupling_time[i] = count;
             cout << "i =    " << i <<"    time = "<<coupling_time[i] << endl;
-        // }
-        
+        }
     }
     sort(coupling_time.begin(), coupling_time.end());
     
@@ -99,7 +98,7 @@ int main()
     // }
     int MAX = coupling_time[coupling_time.size() - 1];
     cout<<"MAX = "<<MAX<<endl;
-    vector<int> distribution(floor(MAX) + 1);
+    vector<double> distribution(floor(MAX) + 1);
     int time_count = 0;
     int M = 20;//count the coupling time every M steps
     distribution[0] = Sample_size;
@@ -115,7 +114,7 @@ int main()
     for(int i = 0; i <= MAX; i++)
     {
     //    cout << " i = "  << i << "*******" <<distribution[i]<<endl;
-        myfile << i * M * dt << distribution[i]/Sample_size <<endl;
+        myfile << i * M * dt <<","<< distribution[i]/Sample_size <<endl;
     }
      
     myfile.close();
