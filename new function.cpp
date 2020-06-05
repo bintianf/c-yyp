@@ -28,7 +28,7 @@ using namespace Eigen;
 
 double eps = 0.05;
 double dt = 0.001;
-int T = 10000;
+int T = 1000;
 double corner = 0;
 double range = 1;
 double a = 2;
