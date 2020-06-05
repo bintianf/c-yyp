@@ -57,7 +57,7 @@ int main()
     int Sample_size = 100;
     vector<int> coupling_time(Sample_size);
     ofstream myfile;
-    myfile.open("keizer.txt");
+    myfile.open("newfunction.txt");
     int N_threads = 8;
 #pragma omp parallel num_threads(N_threads)
     {
