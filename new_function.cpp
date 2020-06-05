@@ -20,7 +20,7 @@
 #include <climits>
 #include <vector>
 #include <algorithm>
-#include <Eigen/Dense>
+#include <eigen/Eigen/Dense>
 
 #define _USE_MATH_DEFINES
 using namespace std;
@@ -128,10 +128,10 @@ int main()
     }
     sort(coupling_time.begin(), coupling_time.end());
     
-    // for(int i = 0; i < Sample_size; i++)
-    // {
-    //     cout << "******i =    "<< coupling_time[i] << endl;
-    // }
+    for(int i = 0; i < Sample_size; i++)
+    {
+        cout << "******i =    " << i << " ,  "<< coupling_time[i] << endl;
+    }
     int MAX = coupling_time[coupling_time.size() - 1];
     cout<<"MAX = "<<MAX<<endl;
     vector<double> distribution(floor(MAX) + 1);
@@ -140,9 +140,11 @@ int main()
     distribution[0] = Sample_size;
     for(int i = 0; i < (int)(MAX/M) +1; i++)
     {
+        cout  << "222222222222" << endl;
         while(coupling_time[time_count]/M == i)
         {
             time_count++;
+            cout  << "111111111" << endl;
         }
         distribution[i+1] = Sample_size - time_count;
 //        cout<<syn_time[i]<<endl;
